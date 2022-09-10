@@ -1,18 +1,19 @@
-// Import des packages :
 const express = require('express');
+// création de l'application avec express :
+const app = express();
+const dotenv = require('dotenv'); // variables d'environnement.
+dotenv.config();
+
 const mongoose = require('mongoose');
 
 const userRoutes = require('./routes/user');
 const sauceRoutes = require('./routes/sauces');
 const path = require('path');
 
-// création de l'application avec express :
-const app = express();
-
 // Connection à la base de données MongoDB :
 mongoose
 	.connect(
-		'mongodb+srv://<USERNAME>:<PASSWORD>@cluster0.fkis9u8.mongodb.net/?retryWrites=true&w=majority',
+		`mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@$cluster0.fkis9u8.mongodb.net/?retryWrites=true&w=majority`,
 		{ useNewUrlParser: true, useUnifiedTopology: true }
 	)
 	.then(() => console.log('Connexion à MongoDB réussie !'))
