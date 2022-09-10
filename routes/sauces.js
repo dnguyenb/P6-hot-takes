@@ -6,15 +6,18 @@
  */
 
 const express = require('express');
-const auth = require('../middleware/auth');
-const sauceCtrl = require('../controllers/sauces');
 const router = express.Router();
 
+const auth = require('../middleware/auth');
+const multer = require('../middleware/multer-config');
+
+const sauceCtrl = require('../controllers/sauces');
+
 // On ajoute le middleware 'auth' en premier dans les routes :
-router.post('/', auth, sauceCtrl.createSauce);
 router.get('/', auth, sauceCtrl.getAllSauces);
+router.post('/', auth, multer, sauceCtrl.createSauce);
 router.get('/:id', auth, sauceCtrl.getOneSauce);
-router.put('/:id', auth, sauceCtrl.modifySauce);
+router.put('/:id', auth, multer, sauceCtrl.modifySauce);
 router.delete('/:id', auth, sauceCtrl.deleteSauce);
 
 // Rend router accessible aux autres fichiers :

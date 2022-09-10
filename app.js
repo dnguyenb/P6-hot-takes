@@ -2,9 +2,9 @@
 const express = require('express');
 const mongoose = require('mongoose');
 
-// Import du routeur :
-const userRoutes = require('./routes/user')
+const userRoutes = require('./routes/user');
 const sauceRoutes = require('./routes/sauces');
+const path = require('path');
 
 // création de l'application avec express :
 const app = express();
@@ -12,7 +12,7 @@ const app = express();
 // Connection à la base de données MongoDB :
 mongoose
 	.connect(
-		'mongodb+srv://username:password@cluster0.fkis9u8.mongodb.net/?retryWrites=true&w=majority',
+		'mongodb+srv://<USERNAME>:<PASSWORD>@cluster0.fkis9u8.mongodb.net/?retryWrites=true&w=majority',
 		{ useNewUrlParser: true, useUnifiedTopology: true }
 	)
 	.then(() => console.log('Connexion à MongoDB réussie !'))
@@ -37,9 +37,9 @@ app.use((req, res, next) => {
 });
 /* _____________________________________________________________________ */
 
-
 app.use('/api/auth', userRoutes);
 app.use('/api/sauces', sauceRoutes);
+app.use('/images', express.static(path.join(__dirname, 'images')));
 
 // On exporte l'application app.js pour la rendre accessible aux autres fichiers
 module.exports = app;
