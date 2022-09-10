@@ -9,6 +9,7 @@ const Sauce = require('../models/Sauce');
 // file system (fs) donne accès aux fonctions qui permettent de modifier le système de fichiers et de supprimer les fichiers.
 const fs = require('fs');
 
+//___________________ CREE UNE SAUCE ___________________
 exports.createSauce = (req, res, next) => {
 	// Les données entrantes sont sous la forme de form-data . Il faut donc utiliser JSON.parse() pour transformer des chaînes de caractères en JSON exploitable :
 	const sauceObject = JSON.parse(req.body.sauce);
@@ -28,6 +29,7 @@ exports.createSauce = (req, res, next) => {
 		.catch((error) => res.status(400).json({ error }));
 };
 
+//___________________ MODIFIE SAUCE ___________________
 exports.modifySauce = (req, res, next) => {
 	const sauceObject = req.file
 		? {
@@ -58,18 +60,21 @@ exports.modifySauce = (req, res, next) => {
 		});
 };
 
+//________________ AFFICHE TOUTES LES SAUCES ___________________
 exports.getAllSauces = (req, res, next) => {
 	Sauce.find() // liste complète
 		.then((sauces) => res.status(200).json(sauces))
 		.catch((error) => res.status(400).json({ error }));
 };
 
+//___________________ AFFICHE UNE SAUCE ___________________
 exports.getOneSauce = (req, res, next) => {
 	Sauce.findOne({ _id: req.params.id })
 		.then((sauce) => res.status(200).json(sauce))
 		.catch((error) => res.status(404).json({ error })); // 404 objet non trouvé
 };
 
+//___________________ SUPPRIME UNE SAUCE ___________________
 /**
  * Il faut d'abord  s'assurer que la personne qui veut supprimer
  * est bien celle qui a créé cette sauce.
@@ -96,4 +101,10 @@ exports.deleteSauce = (req, res, next) => {
 			}
 		})
 		.catch((error) => res.status(500).json({ error }));
+};
+
+//_________________ AIME OU DETESTE UNE SAUCE _________________
+
+exports.likeDislikeSauce = (req, res, next) => {
+	// a travailler
 };

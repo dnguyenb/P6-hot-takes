@@ -20,5 +20,6 @@ router.get('/:id', auth, sauceCtrl.getOneSauce);
 router.put('/:id', auth, multer, sauceCtrl.modifySauce);
 router.delete('/:id', auth, sauceCtrl.deleteSauce);
 
+
 // Rend router accessible aux autres fichiers :
 module.exports = router;

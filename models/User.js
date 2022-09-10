@@ -11,5 +11,5 @@ const userSchema = mongoose.Schema({
 // Empêche d'avoir plusieurs utilisateurs avec la même adresse email
 userSchema.plugin(uniqueValidator);
 
-// Le modèle s'appelle 'User' et on lui passe le Schema de données
+// Le modèle s'appelle 'User' et on lui passe le Schema de données 'userSchema' :
 module.exports = mongoose.model('User', userSchema);
