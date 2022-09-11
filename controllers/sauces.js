@@ -21,6 +21,10 @@ exports.createSauce = (req, res, next) => {
 		imageUrl: `${req.protocol}://${req.get('host')}/images/${
 			req.file.filename
 		}`,
+		likes: 0,
+		dislikes: 0,
+		usersLiked: [],
+		usersDisliked: [],
 	});
 
 	sauce
@@ -105,6 +109,45 @@ exports.deleteSauce = (req, res, next) => {
 
 //_________________ AIME OU DETESTE UNE SAUCE _________________
 
+// Les trois scénarios de la fonction « like » (1, 0, -1).
+// rappel : _id est l'id de la sauce. On commence à récupérer la sauce concernée puis on récupère le req.body.like.
 exports.likeDislikeSauce = (req, res, next) => {
-	// a travailler
+	Sauce.findOne({ _id: req.params.id })
+		.then((sauce) => {
+			// Ajout du LIKE :
+			if (req.body.like === 1) {
+				Sauce.updateOne(
+					{ _id: req.params.id },
+					{
+						// $inc INCrémente la valeur du champs like de l'objet 'Sauce' (voir sauceSchema) de la sauce concernée.
+						$inc: { likes: 1 },
+						// $push AJOUTE l'id dans le tableau du usersLiked (voir sauceSchema) de la sauce concernée.
+						$push: { usersLiked: req.body.userId },
+					}
+				)
+					.then(() =>
+						res
+							.status(201)
+							.json({ message: `${req.body.userId} like ajouté !` })
+					)
+					.catch((error) => res.status(500).json({ error }));
+			}
+			// Ajout du DISLIKE :
+			if (req.body.like === -1) {
+				Sauce.updateOne(
+					{ _id: req.params.id },
+					{
+						$inc: { dislikes: 1 },
+						$push: { usersDisliked: req.body.userId },
+					}
+				)
+					.then(() =>
+						res
+							.status(201)
+							.json({ message: `${req.body.userId} dislike ajouté !` })
+					)
+					.catch((error) => res.status(500).json({ error }));
+			}
+		})
+		.catch((error) => res.status(400).json({ error }));
 };
