@@ -21,10 +21,6 @@ exports.createSauce = (req, res, next) => {
 		imageUrl: `${req.protocol}://${req.get('host')}/images/${
 			req.file.filename
 		}`,
-		likes: 0,
-		dislikes: 0,
-		usersLiked: [],
-		usersDisliked: [],
 	});
 
 	sauce
@@ -109,45 +105,54 @@ exports.deleteSauce = (req, res, next) => {
 
 //_________________ AIME OU DETESTE UNE SAUCE _________________
 
-// Les trois scénarios de la fonction « like » (1, 0, -1).
-// rappel : _id est l'id de la sauce. On commence à récupérer la sauce concernée puis on récupère le req.body.like.
+// Les trois scénarios de la fonction 'like' : 1, 0, -1.
+// on exporte ce middleware dans la route sauce.
 exports.likeDislikeSauce = (req, res, next) => {
-	Sauce.findOne({ _id: req.params.id })
+	const like = req.body.like;
+	const userId = req.body.userId;
+	const sauceId = req.params.id;
+
+	// Recherche de la sauce par son id :
+	Sauce.findOne({ _id: sauceId })
 		.then((sauce) => {
-			// Ajout du LIKE :
-			if (req.body.like === 1) {
-				Sauce.updateOne(
-					{ _id: req.params.id },
-					{
-						// $inc INCrémente la valeur du champs like de l'objet 'Sauce' (voir sauceSchema) de la sauce concernée.
-						$inc: { likes: 1 },
-						// $push AJOUTE l'id dans le tableau du usersLiked (voir sauceSchema) de la sauce concernée.
-						$push: { usersLiked: req.body.userId },
+			// LIKE :
+			switch (like) {
+				// +1 (like)
+				case 1:
+					sauce.likes += 1;
+					sauce.usersLiked.push(userId);
+					break;
+
+				// ANNULATION LIKE OU DISLIKE quand on reclique :
+				case 0:
+					// Dans cette sauce, on vérifie que l'utilisateur existe déja dans le tableau usersliked ou usersDisliked :
+					let userLike = sauce.usersLiked.find((id) => id === userId);
+					let userDislike = sauce.usersDisliked.find((id) => id === userId);
+
+					if (userLike) {
+						// si l'utilisateur a déjà liké et qu'il like à nouveau pour annuler :
+						sauce.likes -= 1;
+						sauce.usersLiked = sauce.usersLiked.filter((id) => id !== userId);
 					}
-				)
-					.then(() =>
-						res
-							.status(201)
-							.json({ message: `${req.body.userId} like ajouté !` })
-					)
-					.catch((error) => res.status(500).json({ error }));
-			}
-			// Ajout du DISLIKE :
-			if (req.body.like === -1) {
-				Sauce.updateOne(
-					{ _id: req.params.id },
-					{
-						$inc: { dislikes: 1 },
-						$push: { usersDisliked: req.body.userId },
+					if (userDislike) {
+						// si l'ulitisateur a déjà disliké et qu'il dislike à nouveau pour annuler :
+						sauce.dislikes -= 1;
+						sauce.usersDisliked = sauce.usersDisliked.filter(
+							(id) => id !== userId
+						);
 					}
-				)
-					.then(() =>
-						res
-							.status(201)
-							.json({ message: `${req.body.userId} dislike ajouté !` })
-					)
-					.catch((error) => res.status(500).json({ error }));
+					break;
+
+				// DISLIKE :
+				case -1:
+					sauce.dislikes += 1;
+					sauce.usersDisliked.push(userId);
 			}
+			// Enregistrement de la sauce :
+			sauce
+				.save()
+				.then(() => res.status(201).json({ message: 'Avis enregistré !' }))
+				.catch((error) => res.status(400).json({ error }));
 		})
-		.catch((error) => res.status(400).json({ error }));
+		.catch((error) => res.status(500).json({ error }));
 };
