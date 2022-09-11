@@ -2,6 +2,8 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User'); // On a besoin du modele 'User'
+const dotenv = require('dotenv');
+dotenv.config();
 
 exports.signup = (req, res, next) => {
 	bcrypt
@@ -42,8 +44,8 @@ exports.login = (req, res, next) => {
 							// si mdp correct, retourner l'id et le token au frontend :
 							res.status(200).json({
 								userId: user._id,
-								token: jwt.sign({ userId: user._id }, 'RANDOM_TOKEN_SECRET', {
-									expiresIn: '24h',
+								token: jwt.sign({ userId: user._id }, process.env.TOKEN, {
+									expiresIn: '2h',
 								}),
 							});
 						}
