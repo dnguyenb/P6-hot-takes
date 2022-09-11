@@ -43,7 +43,7 @@ exports.modifySauce = (req, res, next) => {
 
 	delete sauceObject._userId; // supprime l'id envoyé par le client.
 	Sauce.findOne({ _id: req.params.id })
-		.then((thing) => {
+		.then((sauce) => {
 			if (sauce.userId != req.auth.userId) {
 				res.status(401).json({ message: 'Non autorisé !' });
 			} else {

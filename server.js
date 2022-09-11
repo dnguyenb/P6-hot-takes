@@ -4,7 +4,7 @@ Front activate > ng serve  (msg told if valid = ** Angular Live Development Serv
 User openning : npm run start (msg told id valid = server Online [port: 4200]) Developper openning : npm run dev (msg told id valid = server Online [port: 4200]) */
 
 // Import des packages nécessaires avec la méthode 'require' :
-const http = require('http');
+const http = require('http'); // rajout 's' pour https si on a un certificat SSL.
 const app = require('../backend/app');
 
 /* la fonction normalizePort renvoie un port valide, qu'il soit fourni sous la forme d'un numéro ou d'une chaîne */
