@@ -6,6 +6,7 @@
 
 // On utilise le schema 'Sauce', donc on l'importe :
 const Sauce = require('../models/Sauce');
+
 // file system (fs) donne accès aux fonctions qui permettent de modifier le système de fichiers et de supprimer les fichiers.
 const fs = require('fs');
 
@@ -25,7 +26,7 @@ exports.createSauce = (req, res, next) => {
 
 	sauce
 		.save()
-		.then(() => res.status(201).json({ message: 'Sauce enregistrée !' }))
+		.then(() => res.status(201).json({ message: 'Sauce enregistrée' }))
 		.catch((error) => res.status(400).json({ error }));
 };
 
@@ -51,7 +52,7 @@ exports.modifySauce = (req, res, next) => {
 					{ _id: req.params.id },
 					{ ...sauceObject, _id: req.params.id }
 				)
-					.then(() => res.status(200).json({ message: 'Sauce modifiée !' }))
+					.then(() => res.status(200).json({ message: 'Sauce modifiée' }))
 					.catch((error) => res.status(401).json({ error }));
 			}
 		})
@@ -91,14 +92,71 @@ exports.deleteSauce = (req, res, next) => {
 				// Supprime l'objet et l'image :
 				const filename = sauce.imageUrl.split('/images/')[1];
 				// La méthode unlink() du package fs permet de supprimer un fichier du système de fichiers :
-				fs.unlink('images/${filename}', () => {
+				fs.unlink(`images/${filename}`, () => {
 					Sauce.deleteOne({ _id: req.params.id })
 						.then(() => {
-							res.status(200).json({ message: 'Sauce supprimée !' });
+							res.status(200).json({ message: 'Sauce supprimée' });
 						})
 						.catch((error) => res.status(401).json({ error }));
 				});
 			}
+		})
+		.catch((error) => res.status(500).json({ error }));
+};
+
+//_________________ LIKE and DISLIKE ___________________
+
+/* Les trois scénarios de la fonction 'like' : 1, 0, -1.
+on exporte ce middleware dans la route sauce */
+
+exports.likeDislikeSauce = (req, res, next) => {
+	const like = req.body.like;
+	const userId = req.body.userId;
+	const sauceId = req.params.id;
+
+	// Recherche de la sauce par son id :
+	Sauce.findOne({ _id: sauceId })
+		.then((sauce) => {
+			// LIKE  si l'utilisateur n'a pas déjà cliqué sur like :
+			switch (like) {
+				// +1 (like)
+				case 1:
+					sauce.likes += 1;
+					sauce.usersLiked.push(userId);
+					break;
+
+				// ANNULATION LIKE OU DISLIKE quand on reclique :
+				case 0:
+					// Dans cette sauce, on vérifie que l'utilisateur existe déja dans le tableau usersliked ou usersDisliked :
+					let userLike = sauce.usersLiked.find((id) => id === userId);
+					let userDislike = sauce.usersDisliked.find((id) => id === userId);
+
+					if (userLike) {
+						// si l'utilisateur a déjà liké et qu'il like à nouveau pour annuler :
+						sauce.likes -= 1;
+						sauce.usersLiked = sauce.usersLiked.filter((id) => id !== userId);
+					}
+					if (userDislike) {
+						// si l'ulitisateur a déjà disliké et qu'il dislike à nouveau pour annuler :
+						sauce.dislikes -= 1;
+						sauce.usersDisliked = sauce.usersDisliked.filter(
+							(id) => id !== userId
+						);
+					}
+					break;
+
+				// DISLIKE :
+				case -1:
+					sauce.dislikes += 1;
+					sauce.usersDisliked.push(userId);
+					break;
+			}
+			
+			// Enregistrement de la sauce :
+			sauce
+				.save()
+				.then(() => res.status(201).json({ message: 'Avis enregistré !' }))
+				.catch((error) => res.status(400).json({ error }));
 		})
 		.catch((error) => res.status(500).json({ error }));
 };
