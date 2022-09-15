@@ -11,7 +11,7 @@ const sauceRoutes = require('./routes/sauces');
 // path pour accéder au serveur :
 const path = require('path');
 
-// création de l'application avec le framework express :
+// création de l'application express :
 const app = express();
 
 // variables d'environnement avec dotenv ne pas révéler les infos confidentielles :
@@ -31,7 +31,7 @@ mongoose
 	.then(() => console.log('Connexion à MongoDB réussie !'))
 	.catch(() => console.log('Connexion à MongoDB échouée !'));
 
-// intercepte toutes les requêtes qui ont un content-type json et met à disposition ce contenu sur l'objet req.body :
+/* Permet d'avoir accès au corps de la requête. Il intercepte toutes les requêtes qui ont un content-type 'json' et met à disposition ce contenu sur l'objet req.body */
 app.use(express.json());
 
 /*_______________ CROSS ORIGIN RESSOURCES SHARING __________________

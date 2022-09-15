@@ -17,7 +17,7 @@ exports.createSauce = (req, res, next) => {
 	delete sauceObject._id;
 	delete sauceObject._userId; // on utilise le userId du token
 	const sauce = new Sauce({
-		...sauceObject,
+		...sauceObject, // L'opérateur spread '...' est utilisé pour faire une copie de tous les éléments de req.body
 		userId: req.auth.userId,
 		imageUrl: `${req.protocol}://${req.get('host')}/images/${
 			req.file.filename
@@ -49,8 +49,9 @@ exports.modifySauce = (req, res, next) => {
 				res.status(401).json({ message: 'Non autorisé !' });
 			} else {
 				Sauce.updateOne(
-					{ _id: req.params.id },
-					{ ...sauceObject, _id: req.params.id }
+					// 2 paramètres :
+					{ _id: req.params.id }, // quel objet on modifie.
+					{ ...sauceObject, _id: req.params.id } // nouvelle version de l'objet.
 				)
 					.then(() => res.status(200).json({ message: 'Sauce modifiée' }))
 					.catch((error) => res.status(401).json({ error }));
@@ -151,7 +152,7 @@ exports.likeDislikeSauce = (req, res, next) => {
 					sauce.usersDisliked.push(userId);
 					break;
 			}
-			
+
 			// Enregistrement de la sauce :
 			sauce
 				.save()

@@ -16,5 +16,6 @@ const sauceSchema = mongoose.Schema({
 	usersDisliked: { type: [String], required: true },
 });
 
-// La méthode 'model' transforme ce modèle en un modèle utilisable. On l'exporte :
+/* La méthode 'model' de mongoose transforme ce modèle en un modèle utilisable. On lui passe le nom du modèle('Sauce' et son schema).
+Puis On l'exporte */
 module.exports = mongoose.model('Sauce', sauceSchema);
