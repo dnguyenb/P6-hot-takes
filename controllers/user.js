@@ -28,7 +28,7 @@ exports.login = (req, res, next) => {
 			if (user === null) {
 				// user n'existe pas
 				res
-					.status(401)
+					.status(404)
 					.json({ message: 'Paire identifiant / mot de passe incorrecte' });
 			} else {
 				// s'il existe, comparer les mots de passe :
