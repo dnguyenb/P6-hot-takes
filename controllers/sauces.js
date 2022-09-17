@@ -34,7 +34,7 @@ exports.createSauce = (req, res, next) => {
 exports.modifySauce = (req, res, next) => {
 	if (req.file) {
 		// S'il y a une image dans le body, on supprime l'ancienne dans le dossier 'images' :
-		Sauce.findOne({ _id: req.params.id }) // retrouve la sauce
+		Sauce.findOne({ _id: req.params.id }) // récupère la sauce
 			.then((sauce) => {
 				// si l'id user dans la requête ne correspond pas à celui qui a créé l'original :
 				if (sauce.userId != req.auth.userId) {
@@ -112,7 +112,7 @@ exports.deleteSauce = (req, res, next) => {
 				fs.unlink(`images/${filename}`, () => {
 					Sauce.deleteOne({ _id: req.params.id })
 						.then(() => {
-							res.status(200).json({ message: 'Sauce supprimée' });
+							res.status(204).json({ message: 'Sauce supprimée' });
 						})
 						.catch((error) => res.status(401).json({ error }));
 				});

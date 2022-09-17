@@ -4,26 +4,34 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/User'); // On a besoin du modele 'User'
 const dotenv = require('dotenv');
 dotenv.config();
+const cryptoJs = require('crypto-js');
+// variable pour le cryptage de l'email avec crypto.js :
 
 exports.signup = (req, res, next) => {
+	const emailCrypt = cryptoJs
+		.HmacSHA256(req.body.email, `${process.env.CLE_EMAIL}`)
+		.toString();
 	bcrypt
 		.hash(req.body.password, 10)
 		.then((hash) => {
 			// Avec ce hash, enregistre un nouvel objet utilisateur :
 			const user = new User({
-				email: req.body.email,
+				email: emailCrypt,
 				password: hash,
 			});
 			user
 				.save()
-				.then(() => res.status(201).json({ message: 'Utilisateur créé !' }))
+				.then(() => res.status(201).json({ message: 'Utilisateur créé' }))
 				.catch((error) => res.status(400).json({ error }));
 		})
 		.catch((error) => res.status(500).json({ error })); // 500 erreur serveur
 };
 
 exports.login = (req, res, next) => {
-	User.findOne({ email: req.body.email }) // valeur pour filtrer
+	const emailCrypt = cryptoJs
+		.HmacSHA256(req.body.email, `${process.env.CLE_EMAIL}`)
+		.toString();
+	User.findOne({ email: emailCrypt }) // valeur pour filtrer
 		.then((user) => {
 			if (user === null) {
 				// user n'existe pas
@@ -37,7 +45,7 @@ exports.login = (req, res, next) => {
 					.then((passwordValid) => {
 						// si mdp non valide :
 						if (!passwordValid) {
-							res.status(401).json({
+							res.status(404).json({
 								message: 'Paire identifiant / mot de passe incorrecte',
 							});
 						} else {
