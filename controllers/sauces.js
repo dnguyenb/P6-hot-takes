@@ -20,8 +20,7 @@ exports.createSauce = (req, res, next) => {
 		...sauceObject, // L'opérateur spread '...' est utilisé pour faire une copie de tous les éléments de req.body
 		userId: req.auth.userId,
 		imageUrl: `${req.protocol}://${req.get('host')}/images/${
-			req.file.filename
-		}`,
+			req.file.filename }`,
 	});
 
 	sauce
@@ -38,8 +37,8 @@ exports.modifySauce = (req, res, next) => {
 			.then((sauce) => {
 				// si l'id user dans la requête ne correspond pas à celui qui a créé l'original :
 				if (sauce.userId != req.auth.userId) {
-					return res.status(400).json({ message: 'Non autorisé' });
-				} else if (sauce.userId == req.auth.userId) {
+					return res.status(403).json({ message: 'Non autorisé' });
+				} else {
 					// si l'id user est ok, on peut supprimer l'ancienne image avec unlink(). d'abord récupérer le nom d'image (en 2eme position) dans l'URL en enlevant la partie '/images/' :
 					const filename = sauce.imageUrl.split('/images/')[1];
 					fs.unlink(`images/${filename}`, () => {
@@ -65,7 +64,7 @@ exports.modifySauce = (req, res, next) => {
 		Sauce.findOne({ _id: req.params.id }).then((sauce) => {
 			//on verifie que la sauce appartient bien à l'utilisateur avec verifyUser
 			if (sauce.userId != req.auth.userId) {
-				return res.status(400).json({ message: 'Non autorisé' });
+				return res.status(403).json({ message: 'Non autorisé' });
 			} else {
 				const sauceObject = { ...req.body };
 				Sauce.updateOne(
@@ -104,7 +103,7 @@ exports.deleteSauce = (req, res, next) => {
 		.then((sauce) => {
 			// vérifie si userId de la BDD == userId du token :
 			if (sauce.userId != req.auth.userId) {
-				res.status(401).json({ message: 'Non autorisé !' });
+				res.status(403).json({ message: 'Non autorisé' });
 			} else {
 				// Supprime l'objet et l'image :
 				const filename = sauce.imageUrl.split('/images/')[1];
