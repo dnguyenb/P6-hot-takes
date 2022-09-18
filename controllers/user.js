@@ -5,26 +5,30 @@ const User = require('../models/User'); // On a besoin du modele 'User'
 const dotenv = require('dotenv');
 dotenv.config();
 const cryptoJs = require('crypto-js');
-// variable pour le cryptage de l'email avec crypto.js :
+const emailValidator = require('email-validator');
 
 exports.signup = (req, res, next) => {
 	const emailCrypt = cryptoJs
 		.HmacSHA256(req.body.email, `${process.env.CLE_EMAIL}`)
 		.toString();
-	bcrypt
-		.hash(req.body.password, 10)
-		.then((hash) => {
-			// Avec ce hash, enregistre un nouvel objet utilisateur :
-			const user = new User({
-				email: emailCrypt,
-				password: hash,
-			});
-			user
-				.save()
-				.then(() => res.status(201).json({ message: 'Utilisateur créé' }))
-				.catch((error) => res.status(400).json({ error }));
-		})
-		.catch((error) => res.status(500).json({ error })); // 500 erreur serveur
+	if (!emailValidator.validate(req.body.email)) {
+		return res.status(403).json({ message: 'email invalide' });
+	} else {
+		bcrypt
+			.hash(req.body.password, 10)
+			.then((hash) => {
+				// Avec ce hash, enregistre un nouvel objet utilisateur :
+				const user = new User({
+					email: emailCrypt,
+					password: hash,
+				});
+				user
+					.save()
+					.then(() => res.status(201).json({ message: 'Utilisateur créé' }))
+					.catch((error) => res.status(400).json({ error }));
+			})
+			.catch((error) => res.status(500).json({ error })); // 500 erreur serveur
+	}
 };
 
 exports.login = (req, res, next) => {
@@ -35,7 +39,7 @@ exports.login = (req, res, next) => {
 		.then((user) => {
 			if (user === null) {
 				// user n'existe pas
-				res
+				return res
 					.status(404)
 					.json({ message: 'Paire identifiant / mot de passe incorrecte' });
 			} else {
@@ -54,7 +58,7 @@ exports.login = (req, res, next) => {
 								userId: user._id,
 								token: jwt.sign({ userId: user._id }, process.env.TOKEN, {
 									expiresIn: '2h',
-								}),
+								}), // La méthode 'sign()' de jsonwebtoken envoie un nouveau token qui contient l'Id de l'utilisateur.
 							});
 						}
 					})
