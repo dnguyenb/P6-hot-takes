@@ -20,7 +20,8 @@ exports.createSauce = (req, res, next) => {
 		...sauceObject, // L'opérateur spread '...' est utilisé pour faire une copie de tous les éléments de req.body
 		userId: req.auth.userId,
 		imageUrl: `${req.protocol}://${req.get('host')}/images/${
-			req.file.filename }`,
+			req.file.filename
+		}`,
 	});
 
 	sauce
@@ -125,4 +126,71 @@ exports.deleteSauce = (req, res, next) => {
 /* Les trois scénarios de la fonction 'like' : 1, 0, -1.
 on exporte ce middleware dans la route sauce */
 
-exports.likeDislikeSauce = (req, res, next) => {};
+exports.likeDislikeSauce = (req, res, next) => {
+	const like = req.body.like;
+	const userId = req.body.userId;
+	const sauceId = req.params.id;
+
+	// Recherche de la sauce par son id :
+	Sauce.findOne({ _id: sauceId })
+		.then((sauce) => {
+			// LIKE  si l'utilisateur n'a pas déjà cliqué sur like :
+			switch (like) {
+				// +1 (like)
+				case 1:
+					Sauce.updateOne(
+						{ _id: sauceId },
+						{
+							$inc: { likes: 1 },
+							$push: { usersLiked: userId },
+						}
+					);
+					break;
+
+				// ANNULATION LIKE OU DISLIKE quand on reclique :
+				case 0:
+					// Dans cette sauce, on vérifie que l'utilisateur existe déja dans le tableau usersliked ou usersDisliked :
+					let userLike = sauce.usersLiked.includes(userId);
+					let userDislike = sauce.usersDisliked.includes(userId);
+
+					if (userLike) {
+						// si l'utilisateur a déjà liké et qu'il like à nouveau pour annuler :
+						Sauce.updateOne(
+							{ _id: sauceId },
+							{
+								$inc: { likes: -1 },
+								$pull: { usersLiked: userId },
+							}
+						);
+					}
+					if (userDislike) {
+						// si l'ulitisateur a déjà disliké et qu'il dislike à nouveau pour annuler :
+						Sauce.updateOne(
+							{ _id: sauceId },
+							{
+								$inc: { dislikes: -1 },
+								$pull: { usersDisliked: userId },
+							}
+						);
+					}
+					break;
+
+				// DISLIKE :
+				case -1:
+					Sauce.updateOne(
+						{ _id: sauceId },
+						{
+							$inc: { dislikes: 1 },
+							$push: { usersDisliked: userId },
+						}
+					);
+					break;
+			}
+			// Enregistrement de la sauce :
+			sauce
+				.save()
+				.then(() => res.status(201).json({ message: 'Avis enregistré !' }))
+				.catch((error) => res.status(400).json({ error }));
+		})
+		.catch((error) => res.status(500).json({ error }));
+};

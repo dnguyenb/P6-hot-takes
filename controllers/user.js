@@ -9,7 +9,7 @@ const emailValidator = require('email-validator');
 
 exports.signup = (req, res, next) => {
 	const emailCrypt = cryptoJs
-		.HmacSHA256(req.body.email, `${process.env.CLE_EMAIL}`)
+		.HmacSHA512(req.body.email, `${process.env.CLE_EMAIL}`)
 		.toString();
 	if (!emailValidator.validate(req.body.email)) {
 		return res.status(403).json({ message: 'email invalide' });
@@ -33,7 +33,7 @@ exports.signup = (req, res, next) => {
 
 exports.login = (req, res, next) => {
 	const emailCrypt = cryptoJs
-		.HmacSHA256(req.body.email, `${process.env.CLE_EMAIL}`)
+		.HmacSHA512(req.body.email, `${process.env.CLE_EMAIL}`)
 		.toString();
 	User.findOne({ email: emailCrypt }) // valeur pour filtrer
 		.then((user) => {
