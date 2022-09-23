@@ -22,8 +22,14 @@ Instructions d'installation :
     - npm install
     - npm run start
     - nodemon server
-    - Rajouter un fichier environnement .env qui inclus 3 constantes:
+    - Rajouter un fichier environnement .env qui inclus 4 constantes sur le modèle de .env_sample avec vos valeurs :
 
-      - DB_USERNAME = "**\***"
-      - DB_PASSWORD = "**\***"
-      - TOKEN = "**\***"
+    - connexion à mongoDB :
+      DB_USERNAME = '**\*\***';
+      DB_PASSWORD = '**\*\*\***';
+
+    - Random Token :
+      TOKEN = '****\*****';
+
+    - Password to decrypt via cryto.js :
+      CLE_EMAIL = '****\*\*\*\*****';
