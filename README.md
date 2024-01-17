@@ -1,5 +1,6 @@
 Piiquante The Hottest Reviews
-Piiquante
+
+[hot-takes](https://github.com/dnguyenb/P6-hot-takes/assets/101462601/3efffdfe-840a-477c-b809-7fcadf23520f)
 
 Ce projet est basé sur la création du backend pour un site de critiques de sauces piquantes.
 J'ai utilisé Node.js accompagné du framework Express.js ainsi que divers packages.
