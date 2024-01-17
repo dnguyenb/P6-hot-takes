@@ -1,35 +1,28 @@
-P6-hot-takes
+Piiquante The Hottest Reviews
+Piiquante
 
-Instructions d'installation :
+Ce projet est basé sur la création du backend pour un site de critiques de sauces piquantes.
+J'ai utilisé Node.js accompagné du framework Express.js ainsi que divers packages.
 
-1.  Cloner le repo Frontend https://github.com/OpenClassrooms-Student-Center/Web-Developer-P6
+Pour que cela fonctionne chez vous:
+Tout d'abord cloner ce repository pour le frontend :
 
-2.  Depuis le dossier frontend :
+git clone https://github.com/OpenClassrooms-Student-Center/Web-Developer-P6
 
-        - installer @Angular/CLI avec npm install -g @angular/cli
-        - npm install
-        - npm audit fix s'il ya des erreurs. (Executer ‘npm audit fix --force’ Puis on vérifie avec ‘npm audit’ que tout est ok)
-        - Mettre à jour Angular avec ng update @angular/cli
-        - ng update @angular/core (au besoin ng update @angular/core --force)
-        - ng update rxjs
-        - npm run start
-        - Rdv sur http://localhost:4200/ => la page de signup / login doit s'afficher.
+Ensuite cloner ce repository pour le backend
 
-    lancer le Frontend avec ng serve par la suite.
+git clone https://github.com/Maxwell-gith/MaximeHery_6_17092021
 
-3.  Depuis le dossier Backend :
+Ajouter un dossier nommé "images" dans le backend
 
-    - npm install
-    - npm run start
-    - nodemon server
-    - Rajouter un fichier environnement .env qui inclus 4 constantes sur le modèle de .env_sample avec vos valeurs :
+Démarrer le serveur sur le dossier backend
 
-    - connexion à mongoDB :
-      DB_USERNAME = '**\*\***';
-      DB_PASSWORD = '**\*\*\***';
+cd backend
 
-    - Random Token :
-      TOKEN = '****\*****';
+nodemon server
 
-    - Password to decrypt via cryto.js :
-      CLE_EMAIL = '****\*\*\*\*****';
+Démarrer le frontend
+
+cd frontend
+
+npm start
